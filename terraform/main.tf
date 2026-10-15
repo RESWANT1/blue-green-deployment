@@ -41,6 +41,9 @@ resource "kubernetes_deployment" "blue" {
       }
 
       spec {
+        automount_service_account_token = false
+        enable_service_links            = false
+
         container {
           name              = "myapp"
           image             = "myapp:v1"
@@ -53,6 +56,8 @@ resource "kubernetes_deployment" "blue" {
       }
     }
   }
+
+  wait_for_rollout = true
 }
 
 resource "kubernetes_deployment" "green" {
@@ -83,6 +88,9 @@ resource "kubernetes_deployment" "green" {
       }
 
       spec {
+        automount_service_account_token = false
+        enable_service_links            = false
+
         container {
           name              = "myapp"
           image             = "myapp:v2"
@@ -95,6 +103,8 @@ resource "kubernetes_deployment" "green" {
       }
     }
   }
+
+  wait_for_rollout = true
 }
 
 resource "kubernetes_service" "myapp" {
@@ -107,7 +117,7 @@ resource "kubernetes_service" "myapp" {
 
     selector = {
       app   = "myapp"
-      color = "blue"
+      color = "green"
     }
 
     port {
@@ -116,6 +126,8 @@ resource "kubernetes_service" "myapp" {
       node_port   = 30080
     }
   }
+
+  wait_for_load_balancer = false
 
   depends_on = [
     kubernetes_deployment.blue,
