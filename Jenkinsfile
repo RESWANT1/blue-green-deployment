@@ -6,6 +6,15 @@ pipeline {
     }
 
     stages {
+        stage('Verify with Ansible') {
+            steps {
+                sh '''
+                    set -e
+                    ansible-playbook ansible/verify-deployment.yml
+                '''
+            }
+        }
+
         stage('Validate Deployments') {
             steps {
                 sh '''
