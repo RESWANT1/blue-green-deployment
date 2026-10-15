@@ -1,0 +1,39 @@
+---
+- name: Verify Blue-Green Kubernetes deployment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Check Blue deployment
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - rollout
+          - status
+          - deployment/myapp-blue
+          - --timeout=120s
+      changed_when: false
+
+    - name: Check Green deployment
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - rollout
+          - status
+          - deployment/myapp-green
+          - --timeout=120s
+      changed_when: false
+
+    - name: Display deployment status
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - deployments
+      changed_when: false
+      register: deployment_status
+
+    - name: Show results
+      ansible.builtin.debug:
+        var: deployment_status.stdout_lines
